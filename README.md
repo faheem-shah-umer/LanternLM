@@ -1,103 +1,210 @@
-# LanternLM™
+<div align="center">
+  <img src="public/lanternlm-icon.png" alt="LanternLM logo" width="170" />
 
-**Private, portable AI that runs entirely on your computer.**
+  # LanternLM™
 
-LanternLM is a Windows desktop client for chatting with local GGUF language
-models through llama.cpp. It was built as an offline-first alternative to
-cloud AI clients: prompts, responses, files, and conversation history remain
-on the user's machine.
+  **Private, portable AI that runs on your computer.**
 
-> Status: portfolio release. The source is ready for review; llama.cpp runtime
-> binaries and model weights are installed separately.
+  Run compatible GGUF language models locally through a polished Windows desktop application.
 
-## Highlights
+  [![Offline](https://img.shields.io/badge/inference-100%25%20offline-F4A623?style=for-the-badge)](#privacy-by-design)
+  [![Windows](https://img.shields.io/badge/platform-Windows-0078D4?style=for-the-badge&logo=windows11&logoColor=white)](#requirements)
+  [![TypeScript](https://img.shields.io/badge/built%20with-TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![License](https://img.shields.io/badge/license-MIT-2EA44F?style=for-the-badge)](LICENSE)
 
-- Runs GGUF language models locally without an internet connection
-- Streams generated text from a local llama.cpp server
-- Persists conversations in a local SQLite database
-- Discovers multiple models and lets the user select one
-- Includes a portable file workspace with text, image, and PDF previews
-- Keeps Electron renderer access behind a context-isolated preload API
-- Packages as a Windows desktop application with Electron Builder
+  **No cloud API · No telemetry · User-owned models and data**
+
+  [Features](#features) · [Architecture](#architecture) · [Quick start](#quick-start) · [Development](#development) · [License](#license-and-attribution)
+</div>
+
+---
+
+## About
+
+LanternLM is an offline-first desktop client for local language models. It
+starts a bundled [llama.cpp](https://github.com/ggml-org/llama.cpp) server on
+your machine, discovers compatible `.gguf` models, streams generated responses,
+and stores conversations locally in SQLite.
+
+The project was built to explore a simple idea: a useful AI assistant should
+still work when the internet does not—and private prompts should not need to
+leave the device.
+
+> [!NOTE]
+> This repository contains the application source. Model weights and llama.cpp
+> binaries are installed separately because they are large third-party
+> artifacts with their own licenses.
+
+## Features
+
+| | Capability | What it provides |
+|---|---|---|
+| 🔒 | **Offline inference** | Prompts and responses stay on the local machine. |
+| 🧠 | **Model discovery** | Detects compatible GGUF models placed in the models directory. |
+| ⚡ | **Streaming chat** | Displays tokens while llama.cpp generates a response. |
+| 💾 | **Persistent history** | Stores conversations locally with SQLite. |
+| 📁 | **File workspace** | Imports, organizes, previews, renames, and exports local files. |
+| 🖥️ | **Desktop experience** | Packages the React interface as a native Windows application with Electron. |
 
 ## Architecture
 
-```text
-React + TypeScript renderer
-          │
-          ├── local HTTP stream ──> llama.cpp server ──> GGUF model
-          │
-          └── Electron preload ──> IPC handlers ──> SQLite + local files
+```mermaid
+flowchart LR
+    UI[React + TypeScript UI]
+    PRELOAD[Context-isolated preload API]
+    MAIN[Electron main process]
+    DB[(SQLite chat history)]
+    FILES[(Local workspace)]
+    SERVER[llama.cpp server<br/>127.0.0.1:4891]
+    MODEL[(GGUF model)]
+
+    UI -->|IPC| PRELOAD
+    PRELOAD --> MAIN
+    MAIN --> DB
+    MAIN --> FILES
+    MAIN -->|starts and monitors| SERVER
+    UI -->|local streamed HTTP| SERVER
+    SERVER --> MODEL
 ```
 
-The Electron main process starts `llama-server.exe` on `127.0.0.1:4891` and
-manages application data under `portable/`. The renderer streams completions
-from the local OpenAI-compatible endpoint. Conversations are stored in SQLite;
-no telemetry or cloud API is used by LanternLM.
+The Electron main process owns filesystem and database access. The renderer is
+context-isolated and reaches those capabilities through a narrow preload API.
+Inference is served locally through llama.cpp's OpenAI-compatible endpoint.
 
 ## Technology
 
-- Electron
-- React 19 and TypeScript
-- Vite
-- llama.cpp
-- better-sqlite3
-- Electron Builder
+| Layer | Technologies |
+|---|---|
+| Interface | React 19, TypeScript, CSS |
+| Desktop runtime | Electron |
+| Local inference | llama.cpp, GGUF |
+| Persistence | SQLite, better-sqlite3 |
+| Tooling | Vite, ESLint, Electron Builder |
 
-## Prerequisites
+## Requirements
 
 - Windows 10 or newer
 - Node.js 20 or newer
 - A Windows llama.cpp release containing `llama-server.exe`
-- At least one compatible `.gguf` instruct model
-- Enough RAM for the selected model and context size
+- At least one compatible GGUF instruct model
+- Sufficient RAM for the selected model and context size
 
-Model weights and llama.cpp binaries are deliberately not committed. They are
-large third-party artifacts with independent licenses.
+> [!TIP]
+> Quantized models generally require less memory. Review the model card and
+> license before downloading or redistributing any model.
 
-## Local setup
+## Quick start
 
-1. Clone the repository and run `npm install`.
-2. Copy `llama-server.exe` and the DLL files from the same llama.cpp release
-   into `portable/bin/`.
-3. Copy a compatible `.gguf` model into `portable/models/`.
-4. Run `npm run dev`.
-5. Select the model in LanternLM and choose **Load model**.
-
-## Quality checks
+### 1. Clone and install
 
 ```powershell
-npm run lint
-npm run typecheck
-npm run build
+git clone https://github.com/faheem-shah-umer/LanternLM.git
+cd LanternLM
+npm install
 ```
 
-Run all checks together with `npm run check`.
+### 2. Add the llama.cpp runtime
 
-## Build a Windows installer
+Download a Windows llama.cpp release and copy `llama-server.exe` together with
+the DLL files from that same release into:
 
-Run `npm run dist`. The installer is written to `release/`. Runtime binaries
-may be included in a private or release build, but model weights should
-normally be distributed separately. Review all third-party licenses before
-publishing a binary package.
+```text
+portable/bin/
+```
 
-## Repository hygiene
+### 3. Add a model
 
-The Git configuration excludes model weights, llama.cpp binaries, installers,
-compiled output, SQLite databases, chat history, exports, and workspace files.
-Never force-add those files without reviewing their size, privacy, and license.
+Download a compatible `.gguf` instruct model—for example, from Hugging Face—and
+place it in:
 
-## Privacy and limitations
+```text
+portable/models/
+```
 
-- LanternLM itself makes no cloud requests, but users are responsible for the
-  origin and behavior of separately obtained models and runtime binaries.
-- Generated text can be inaccurate.
-- Performance depends on model size and host hardware.
-- The current release targets Windows and CPU-based llama.cpp distributions.
+Models are discovered automatically when LanternLM starts. They are excluded
+from Git and are never uploaded by this project.
+
+### 4. Run LanternLM
+
+```powershell
+npm run dev
+```
+
+Select a discovered model, choose **Load**, and start a conversation.
+
+## Repository layout
+
+```text
+LanternLM/
+├── electron/                 # Main process and context-isolated preload API
+├── public/                   # Application branding
+├── src/                      # React interface and file workspace
+├── portable/
+│   ├── bin/                  # Local llama.cpp runtime (not committed)
+│   ├── models/               # Local GGUF models (not committed)
+│   ├── workspaces/           # User files and SQLite history (not committed)
+│   └── exports/              # Exported files (not committed)
+├── package.json
+└── README.md
+```
+
+## Development
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start Vite and Electron in development mode |
+| `npm run lint` | Check the TypeScript and React source |
+| `npm run typecheck` | Type-check the renderer and Electron processes |
+| `npm run build` | Create a production application build |
+| `npm run check` | Run linting, type-checking, and the production build |
+| `npm run dist` | Build a Windows installer in `release/` |
+
+## Privacy by design
+
+- Inference runs against a server bound to `127.0.0.1`.
+- LanternLM does not require a cloud API key.
+- Conversation history is stored in a local SQLite database.
+- Models, workspace files, exports, and chat databases are excluded from Git.
+- The application does not include telemetry.
+
+LanternLM cannot make guarantees about separately downloaded models or runtime
+binaries. Obtain them from sources you trust and review their licenses.
+
+## Current scope
+
+LanternLM is a portfolio release focused on Windows and local llama.cpp
+inference. Performance and output quality depend on the chosen model and host
+hardware. Generated responses can be inaccurate and should be verified when
+used for important decisions.
+
+## Roadmap
+
+- [ ] Guided runtime and model setup
+- [ ] Configurable context size and generation parameters
+- [ ] Markdown and syntax-highlighted responses
+- [ ] Model loading and generation diagnostics
+- [ ] Automated tests for path handling and persistence
+
+## Contributing
+
+Issues and focused pull requests are welcome. Before submitting a change, run:
+
+```powershell
+npm run check
+```
+
+Do not commit model weights, runtime binaries, chat databases, workspace files,
+or generated installers.
 
 ## License and attribution
 
-Copyright © 2026 Faheem Shah Umer Vattam Kandathil. The source is available under the [MIT License](LICENSE).
+Copyright © 2026 **Faheem Shah Umer Vattam Kandathil**.
 
-LanternLM™ is an unregistered project mark used by Faheem Shah Umer Vattam Kandathil. See [NOTICE.md](NOTICE.md)
-and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for attribution details.
+The source code is available under the [MIT License](LICENSE). LanternLM™ is an
+unregistered project mark used by Faheem Shah Umer Vattam Kandathil. See the
+[project notice](NOTICE.md) and [third-party notices](THIRD_PARTY_NOTICES.md)
+for additional attribution.
+
+<div align="center">
+  <sub>Built for private, local and portable AI.</sub>
+</div>
