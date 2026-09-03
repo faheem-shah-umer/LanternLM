@@ -1,0 +1,47 @@
+# Dependencies and build output
+node_modules/
+dist/
+dist-electron/
+release/
+App release/
+
+# Local runtime, models, and user data
+portable/bin/*
+!portable/bin/README.md
+portable/models/*
+!portable/models/README.md
+portable/exports/*
+!portable/exports/.gitkeep
+portable/workspaces/*
+!portable/workspaces/default/
+portable/workspaces/default/*
+!portable/workspaces/default/files/
+portable/workspaces/default/files/*
+!portable/workspaces/default/files/.gitkeep
+*.gguf
+*.db
+*.db-shm
+*.db-wal
+
+# Installers and native binaries
+*.exe
+*.dll
+*.blockmap
+
+# Logs, local settings, editors, and operating systems
+logs/
+*.log
+*.local
+.env
+.env.*
+!.env.example
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

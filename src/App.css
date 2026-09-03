@@ -1,0 +1,276 @@
+* {
+  box-sizing: border-box;
+}
+
+:root, body, html, #root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: #0b0b0b;
+  color: #eaeaea;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.appShell {
+  height: 100%;
+  display: flex;
+  background: #0b0b0b;
+  color: #eaeaea;
+}
+
+.sidebar {
+  width: 280px;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #0f0f0f;
+}
+
+.sidebar-top {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.brand {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.01em;
+}
+
+.brand img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.brand sup {
+  margin-left: 2px;
+  font-size: 8px;
+  color: #f3a928;
+}
+
+.ownership {
+  padding: 0 4px;
+  color: #666;
+  font-size: 11px;
+}
+
+.new-chat {
+  width: 100%;
+  padding: 10px;
+  background: #151515;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #eaeaea;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  overflow: auto;
+}
+
+.section-title {
+  font-size: 12px;
+  color: #888;
+}
+
+.sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-btn {
+  width: 100%;
+  padding: 10px;
+  background: #151515;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #eaeaea;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.sidebar-btn.active {
+  background: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.18);
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: #121212;
+  border-radius: 10px;
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.06);
+  color: #eaeaea;
+  cursor: pointer;
+}
+
+.dropdown-item.danger {
+  border-color: rgba(231,76,60,0.45);
+  color: #ffb3ab;
+}
+
+.mainPane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chatPane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 18px 22px;
+}
+
+.chatScroll {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.chatBottomSpacer {
+  flex: 1;
+}
+
+.bubble {
+  max-width: 70%;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+  line-height: 1.35;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.bubble.user {
+  align-self: flex-end;
+  background: rgba(255,255,255,0.08);
+}
+
+.bubble.assistant {
+  align-self: flex-start;
+}
+
+.composer {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 14px 22px;
+}
+
+.composerRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.pillInput {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 12px 14px;
+  color: #fff;
+  outline: none;
+  min-height: 44px;
+  resize: none;
+  font-family: inherit;
+}
+
+.pillInput:focus {
+  border-color: rgba(255,255,255,0.18);
+}
+
+.sendBtn {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  cursor: pointer;
+}
+
+.composerMeta {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+}
+
+.modelSelect {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: #fff;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.statusDot.ready { background: #2ecc71; }
+.statusDot.loading { background: #f39c12; }
+.statusDot.error { background: #e74c3c; }
+
+.statusText {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.iconBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  cursor: pointer;
+}
+
+.renameInput {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: #eaeaea;
+  outline: none;
+  font: inherit;
+}
